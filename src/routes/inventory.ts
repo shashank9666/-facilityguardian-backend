@@ -29,7 +29,7 @@ router.post(
   requireRole("technician"),
   [
     body("name").notEmpty().trim().escape(),
-    body("code").notEmpty().trim().escape(),
+    body("code").optional().trim().escape(),
     body("category").notEmpty().trim(),
     body("quantity").isInt({ min: 0 }),
     body("minQuantity").isInt({ min: 0 }),

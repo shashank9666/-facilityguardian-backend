@@ -31,7 +31,7 @@ router.post(
     body("name").notEmpty().trim().escape(),
     body("email").isEmail().normalizeEmail(),
     body("category").notEmpty().trim(),
-    body("contactPerson").notEmpty().trim().escape(),
+    body("contactName").optional().trim().escape(),
     validate,
   ],
   ctrl.createVendor,

@@ -18,6 +18,10 @@ import incidentRoutes    from "./routes/incidents";
 import inventoryRoutes   from "./routes/inventory";
 import spaceRoutes       from "./routes/spaces";
 import maintenanceRoutes from "./routes/maintenance";
+import amcRoutes         from "./routes/amc";
+import documentRoutes    from "./routes/documents";
+import checklistRoutes   from "./routes/checklists";
+import meterRoutes       from "./routes/meter-readings";
 
 const app  = express();
 const PORT = parseInt(process.env.PORT ?? "5000", 10);
@@ -78,6 +82,10 @@ app.use("/api/incidents",   incidentRoutes);
 app.use("/api/inventory",   inventoryRoutes);
 app.use("/api/spaces",      spaceRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/amc",         amcRoutes);
+app.use("/api/documents",   documentRoutes);
+app.use("/api/checklists",  checklistRoutes);
+app.use("/api/meter-readings", meterRoutes);
 
 // ── Error handling ────────────────────────────────────────────────────────────
 app.use(notFound);

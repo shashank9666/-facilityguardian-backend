@@ -33,4 +33,6 @@ const SpaceSchema = new Schema<ISpace>(
   { timestamps: true }
 );
 
+SpaceSchema.index({ name: "text", site: "text", building: "text" });
+
 export const Space = model<ISpace>("Space", SpaceSchema);

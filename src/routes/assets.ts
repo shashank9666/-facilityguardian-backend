@@ -34,7 +34,7 @@ router.post(
   requireRole("technician"),
   [
     body("name").notEmpty().trim().escape(),
-    body("code").notEmpty().trim().escape(),
+    body("code").optional().trim().escape(),
     body("category").notEmpty().trim(),
     body("status").optional().isIn(["active", "inactive", "maintenance", "decommissioned"]),
     body("location").notEmpty().trim().escape(),
