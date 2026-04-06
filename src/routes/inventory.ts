@@ -21,6 +21,7 @@ router.get(
   ctrl.getInventory,
 );
 
+router.get("/stats", authenticate, ctrl.getStats);
 router.get("/:id", authenticate, [param("id").isMongoId(), validate], ctrl.getInventoryItem);
 
 router.post(

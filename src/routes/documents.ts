@@ -6,6 +6,7 @@ import * as ctrl from "../controllers/documents";
 const router = Router();
 
 router.get("/", authenticate, ctrl.getDocuments);
+router.get("/stats", authenticate, ctrl.getStats);
 router.post("/", authenticate, requireRole("manager"), ctrl.createDocument);
 router.patch("/:id", authenticate, requireRole("manager"), ctrl.updateDocument);
 router.delete("/:id", authenticate, requireRole("manager"), ctrl.deleteDocument);

@@ -19,6 +19,24 @@ export async function getInventory(req: Request, res: Response, next: NextFuncti
   } catch (err) { next(err); }
 }
 
+// GET /api/inventory/stats
+export async function getStats(req: Request, res: Response, next: NextFunction) {
+  try {
+    const total = await Inventory.countDocuments();
+    const in_stock = await Inventory.countDocuments({ status: "in_stock" });
+    const low_stock = await Inventory.countDocuments({ status: "low_stock" });
+    const out_of_stock = await Inventory.countDocuments({ status: "out_of_stock" });
+    
+    // Compute total inventory value using aggregation
+    const valueAgg = await Inventory.aggregate([
+      { $group: { _id: null, totalValue: { $sum: { $multiply: ["$quantity", "$unitCost"] } } } }
+    ]);
+    const totalValue = valueAgg[0]?.totalValue || 0;
+
+    res.json({ success: true, data: { total, in_stock, low_stock, out_of_stock, totalValue } });
+  } catch (err) { next(err); }
+}
+
 // GET /api/inventory/:id
 export async function getInventoryItem(req: Request, res: Response, next: NextFunction) {
   try {
