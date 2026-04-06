@@ -26,6 +26,19 @@ import meterRoutes       from "./routes/meter-readings";
 const app  = express();
 const PORT = parseInt(process.env.PORT ?? "5000", 10);
 
+// ── CORS (must be first — before rate limiters so preflight OPTIONS passes) ───
+const allowedOrigins = (process.env.CORS_ORIGIN ?? "http://localhost:3000").split(",").map(o => o.trim());
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.options("*", cors()); // Handle preflight for all routes
+
 // ── Security ──────────────────────────────────────────────────────────────────
 app.use(helmet());
 app.disable("x-powered-by");
@@ -47,16 +60,6 @@ const authLimiter = rateLimit({
 });
 app.use("/api/auth/login",    authLimiter);
 app.use("/api/auth/register", authLimiter);
-
-// ── CORS ─────────────────────────────────────────────────────────────────────
-const allowedOrigins = (process.env.CORS_ORIGIN ?? "http://localhost:3000").split(",").map(o => o.trim());
-app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-    cb(new Error(`CORS: origin ${origin} not allowed`));
-  },
-  credentials: true,
-}));
 
 // ── Body parsing + Compression ────────────────────────────────────────────────
 app.use(compression());

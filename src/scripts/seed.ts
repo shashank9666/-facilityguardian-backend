@@ -31,11 +31,11 @@ async function seed() {
 
   // Users
   const users = await User.insertMany([
-    { name: "Rajesh Kumar",  email: "admin@fmnexus.in",   password: await bcrypt.hash("Admin@123", 12), role: "admin",      active: true },
-    { name: "Priya Sharma",  email: "manager@fmnexus.in", password: await bcrypt.hash("Admin@123", 12), role: "manager",    active: true },
-    { name: "Arjun Singh",   email: "tech1@fmnexus.in",   password: await bcrypt.hash("Admin@123", 12), role: "technician", active: true },
-    { name: "Meena Patel",   email: "tech2@fmnexus.in",   password: await bcrypt.hash("Admin@123", 12), role: "technician", active: true },
-    { name: "Suresh Babu",   email: "viewer@fmnexus.in",  password: await bcrypt.hash("Admin@123", 12), role: "viewer",     active: true },
+    { name: "Rajesh Kumar",  email: "admin@fmnexus.in",   password: await bcrypt.hash("Admin123", 12), role: "admin",      active: true },
+    { name: "Priya Sharma",  email: "manager@fmnexus.in", password: await bcrypt.hash("Admin123", 12), role: "manager",    active: true },
+    { name: "Arjun Singh",   email: "tech1@fmnexus.in",   password: await bcrypt.hash("Admin123", 12), role: "technician", active: true },
+    { name: "Meena Patel",   email: "tech2@fmnexus.in",   password: await bcrypt.hash("Admin123", 12), role: "technician", active: true },
+    { name: "Suresh Babu",   email: "viewer@fmnexus.in",  password: await bcrypt.hash("Admin123", 12), role: "viewer",     active: true },
   ]);
   console.log(`✓ Seeded ${users.length} users`);
 
