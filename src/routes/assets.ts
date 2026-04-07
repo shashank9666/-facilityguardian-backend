@@ -36,7 +36,7 @@ router.post(
     body("name").notEmpty().trim().escape(),
     body("code").optional().trim().escape(),
     body("category").notEmpty().trim(),
-    body("status").optional().isIn(["active", "inactive", "maintenance", "decommissioned"]),
+    body("status").optional().isIn(["operational", "faulty", "maintenance", "decommissioned"]),
     body("location").notEmpty().trim().escape(),
     validate,
   ],
@@ -50,7 +50,7 @@ router.patch(
   [
     param("id").isMongoId(),
     body("name").optional().trim().escape(),
-    body("status").optional().isIn(["active", "inactive", "maintenance", "decommissioned"]),
+    body("status").optional().isIn(["operational", "faulty", "maintenance", "decommissioned"]),
     validate,
   ],
   ctrl.updateAsset,
