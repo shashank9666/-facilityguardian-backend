@@ -33,6 +33,7 @@ router.post(
 );
 
 router.get("/me", authenticate, ctrl.getMe);
+router.patch("/me", authenticate, ctrl.updateMe);
 
 router.patch(
   "/change-password",
@@ -47,6 +48,8 @@ router.patch(
   ],
   ctrl.changePassword,
 );
+
+router.get("/technicians", authenticate, ctrl.getTechnicians);
 
 // Admin-only user management
 router.get("/users", authenticate, requireRole("admin"), ctrl.getUsers);
@@ -63,6 +66,14 @@ router.patch(
     validate,
   ],
   ctrl.updateUser,
+);
+
+router.delete(
+  "/users/:id",
+  authenticate,
+  requireRole("admin"),
+  [param("id").isMongoId(), validate],
+  ctrl.deleteUser,
 );
 
 export default router;

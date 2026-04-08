@@ -5,9 +5,11 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 import compression from "compression";
+import mongoSanitize from "express-mongo-sanitize";
 import { connectDB } from "./config/database";
 import { logger } from "./config/logger";
 import { errorHandler, notFound } from "./middleware/errorHandler";
+import { xssSanitizer } from "./middleware/sanitize";
 
 // Routes
 import authRoutes        from "./routes/auth";
@@ -22,6 +24,8 @@ import amcRoutes         from "./routes/amc";
 import documentRoutes    from "./routes/documents";
 import checklistRoutes   from "./routes/checklists";
 import meterRoutes       from "./routes/meter-readings";
+import notificationRoutes from "./routes/notifications";
+import statsRoutes       from "./routes/stats";
 
 const app  = express();
 const PORT = parseInt(process.env.PORT ?? "5000", 10);
@@ -65,6 +69,8 @@ app.use("/api/auth/register", authLimiter);
 app.use(compression());
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: false, limit: "10kb" }));
+app.use(mongoSanitize());
+app.use(xssSanitizer);
 
 // ── Logging ───────────────────────────────────────────────────────────────────
 app.use(morgan("combined", {
@@ -89,14 +95,26 @@ app.use("/api/amc",         amcRoutes);
 app.use("/api/documents",   documentRoutes);
 app.use("/api/checklists",  checklistRoutes);
 app.use("/api/meter-readings", meterRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/stats", statsRoutes);
 
 // ── Error handling ────────────────────────────────────────────────────────────
 app.use(notFound);
 app.use(errorHandler);
 
+import { seedMissingNotifications } from "./utils/seedNotifications";
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 async function start() {
   await connectDB();
+  
+  // Seed notifications for existing active items
+  try {
+    await seedMissingNotifications();
+  } catch (err) {
+    logger.error("Seeding error:", err);
+  }
+
   app.listen(PORT, () => {
     logger.info(`🚀 FMNexus API running on http://localhost:${PORT}`);
     logger.info(`   Environment: ${process.env.NODE_ENV ?? "development"}`);

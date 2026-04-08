@@ -13,7 +13,7 @@ router.get(
   [
     query("page").optional().isInt({ min: 1 }),
     query("limit").optional().isInt({ min: 1, max: 200 }),
-    query("status").optional().isString().trim(),
+    query("status").optional().isIn(["open", "assigned", "in_progress", "on_hold", "completed", "cancelled"]),
     query("priority").optional().isIn(["low", "medium", "high", "critical"]),
     query("type").optional().isString().trim(),
     query("q").optional().isString().trim().escape(),
@@ -50,7 +50,7 @@ router.patch(
   requireRole("technician"),
   [
     param("id").isMongoId(),
-    body("status").optional().isIn(["open", "in_progress", "on_hold", "completed", "cancelled"]),
+    body("status").optional().isIn(["open", "assigned", "in_progress", "on_hold", "completed", "cancelled"]),
     body("priority").optional().isIn(["low", "medium", "high", "critical"]),
     validate,
   ],

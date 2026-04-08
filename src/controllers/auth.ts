@@ -68,6 +68,15 @@ export async function getMe(req: AuthRequest, res: Response, next: NextFunction)
   } catch (err) { next(err); }
 }
 
+// PATCH /api/auth/me
+export async function updateMe(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const { password, ...rest } = req.body;
+    const user = await User.findByIdAndUpdate(req.user?._id, rest, { new: true, runValidators: true });
+    res.json({ success: true, data: user });
+  } catch (err) { next(err); }
+}
+
 // PATCH /api/auth/change-password
 export async function changePassword(req: AuthRequest, res: Response, next: NextFunction) {
   try {
@@ -97,6 +106,21 @@ export async function getUsers(req: Request, res: Response, next: NextFunction) 
   } catch (err) { next(err); }
 }
 
+// GET /api/auth/technicians (any authenticated user)
+// Returns public list of assignable users
+export async function getTechnicians(req: Request, res: Response, next: NextFunction) {
+  try {
+    const technicians = await User.find({
+      role: { $in: ["technician", "manager"] },
+      active: true
+    })
+    .select("name email role department active")
+    .sort({ name: 1 });
+    
+    res.json({ success: true, data: technicians });
+  } catch (err) { next(err); }
+}
+
 // PATCH /api/auth/users/:id  (admin only)
 export async function updateUser(req: Request, res: Response, next: NextFunction) {
   try {
@@ -104,5 +128,14 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
     const user = await User.findByIdAndUpdate(req.params.id, rest, { new: true, runValidators: true });
     if (!user) { res.status(404).json({ success: false, message: "User not found" }); return; }
     res.json({ success: true, data: user });
+  } catch (err) { next(err); }
+}
+
+// DELETE /api/auth/users/:id  (admin only)
+export async function deleteUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) { res.status(404).json({ success: false, message: "User not found" }); return; }
+    res.json({ success: true, message: "User deleted" });
   } catch (err) { next(err); }
 }

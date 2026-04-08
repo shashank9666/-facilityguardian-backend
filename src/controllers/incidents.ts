@@ -37,6 +37,24 @@ export async function createIncident(req: AuthRequest, res: Response, next: Next
       reportedBy: req.body.reportedBy ?? req.user?.name ?? "system",
       timeline: [{ action: "reported", performedBy: req.user?.name ?? "system", timestamp: new Date() }],
     });
+
+    // Notify admins and managers
+    const { createSystemNotification } = await import("../utils/notifications");
+    await createSystemNotification({
+      role: "admin",
+      type: "warning",
+      title: "New Incident Reported",
+      message: `${incident.title} (${incident.severity} severity) reported at ${incident.location}`,
+      link: `/incidents`
+    });
+    await createSystemNotification({
+      role: "manager",
+      type: "warning",
+      title: "New Incident Reported",
+      message: `${incident.title} (${incident.severity} severity) reported at ${incident.location}`,
+      link: `/incidents`
+    });
+
     res.status(201).json({ success: true, data: incident });
   } catch (err) { next(err); }
 }

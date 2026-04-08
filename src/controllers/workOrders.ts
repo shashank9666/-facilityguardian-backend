@@ -50,6 +50,7 @@ export async function updateWorkOrder(req: AuthRequest, res: Response, next: Nex
     const wo = await WorkOrder.findById(req.params.id);
     if (!wo) { res.status(404).json({ success: false, message: "Work order not found" }); return; }
 
+    const oldAssignee = wo.assignedTo;
     Object.assign(wo, rest);
     if (status && status !== wo.status) {
       wo.status = status;
@@ -58,6 +59,31 @@ export async function updateWorkOrder(req: AuthRequest, res: Response, next: Nex
       wo.auditLog.push({ action: `status → ${status}`, performedBy: req.user?.name ?? "system", timestamp: new Date() });
     }
     await wo.save();
+
+    // Notify technician if newly assigned
+    if (wo.assignedTo && wo.assignedTo !== oldAssignee) {
+      const { createSystemNotification } = await import("../utils/notifications");
+      const { User } = await import("../models/User");
+      const mongoose = await import("mongoose");
+
+      // Resolve name to ID if needed
+      const user = await User.findOne({ 
+        $or: [
+          { name: wo.assignedTo },
+          { _id: wo.assignedTo.match(/^[0-9a-fA-F]{24}$/) ? wo.assignedTo : new mongoose.Types.ObjectId() }
+        ]
+      });
+
+      if (user) {
+        await createSystemNotification({
+          userId: user._id,
+          type: "info",
+          title: "New Work Order Assigned",
+          message: `You have been assigned: ${wo.title}`,
+          link: `/my-tasks`
+        });
+      }
+    }
     res.json({ success: true, data: wo });
   } catch (err) { next(err); }
 }

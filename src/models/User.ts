@@ -9,6 +9,16 @@ export interface IUser extends Document {
   department: string;
   active: boolean;
   lastLogin?: Date;
+  notificationPreferences: {
+    workOrderAssigned: boolean;
+    pmScheduleDue: boolean;
+    incidentReported: boolean;
+    lowStockAlert: boolean;
+    assetStatusChange: boolean;
+    vendorContractExpiry: boolean;
+    workOrderOverdue: boolean;
+    dailySummary: boolean;
+  };
   comparePassword(candidate: string): Promise<boolean>;
   createdAt: Date;
   updatedAt: Date;
@@ -23,6 +33,16 @@ const UserSchema = new Schema<IUser>(
     department: { type: String, trim: true, default: "" },
     active:     { type: Boolean, default: true },
     lastLogin:  { type: Date },
+    notificationPreferences: {
+      workOrderAssigned:    { type: Boolean, default: true },
+      pmScheduleDue:        { type: Boolean, default: true },
+      incidentReported:      { type: Boolean, default: true },
+      lowStockAlert:        { type: Boolean, default: true },
+      assetStatusChange:    { type: Boolean, default: false },
+      vendorContractExpiry: { type: Boolean, default: true },
+      workOrderOverdue:     { type: Boolean, default: true },
+      dailySummary:         { type: Boolean, default: false },
+    },
   },
   { timestamps: true }
 );
@@ -40,4 +60,4 @@ UserSchema.methods.comparePassword = async function (candidate: string): Promise
   return bcrypt.compare(candidate, this.password);
 };
 
-export const User = model<IUser>("User", UserSchema);
+export const User = model<IUser>("User", UserSchema, "users");
