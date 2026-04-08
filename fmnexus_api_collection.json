@@ -1,0 +1,103 @@
+{
+	"info": {
+		"_postman_id": "fmnexus-api-collection-full",
+		"name": "FM-Nexus API (Full)",
+		"description": "Complete API Collection for FM-Nexus Facility Management System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@fmnexus.in\",\n    \"password\": \"Admin@123\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+					}
+				},
+				{
+					"name": "Get Current User (Me)",
+					"request": {
+						"method": "GET",
+						"url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Assets",
+			"item": [
+				{ "name": "List Assets", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/assets?q=&status=&category=", "host": ["{{baseUrl}}"], "path": ["assets"], "query": [{ "key": "q", "value": "" }, { "key": "status", "value": "" }, { "key": "category", "value": "" }] } } },
+				{ "name": "Get Asset by ID", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/assets/:id", "host": ["{{baseUrl}}"], "path": ["assets", ":id"], "variable": [{ "key": "id", "value": "" }] } } },
+				{ "name": "Create Asset", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\n    \"name\": \"AHU-01\",\n    \"category\": \"HVAC\",\n    \"location\": \"Roof\",\n    \"status\": \"operational\"\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assets", "host": ["{{baseUrl}}"], "path": ["assets"] } } },
+				{ "name": "Update Asset", "request": { "method": "PATCH", "body": { "mode": "raw", "raw": "{\n    \"status\": \"maintenance\"\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assets/:id", "host": ["{{baseUrl}}"], "path": ["assets", ":id"], "variable": [{"key":"id","value":""}] } } },
+				{ "name": "Delete Asset", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/assets/:id", "host": ["{{baseUrl}}"], "path": ["assets", ":id"], "variable": [{"key":"id","value":""}] } } }
+			]
+		},
+		{
+			"name": "3. Work Orders",
+			"item": [
+				{ "name": "List Work Orders", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/work-orders?status=&priority=", "host": ["{{baseUrl}}"], "path": ["work-orders"] } } },
+				{ "name": "Create Work Order", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\n    \"title\": \"Fix Sensor\",\n    \"priority\": \"high\",\n    \"type\": \"corrective\"\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/work-orders", "host": ["{{baseUrl}}"], "path": ["work-orders"] } } },
+				{ "name": "Update Status", "request": { "method": "PATCH", "body": { "mode": "raw", "raw": "{\n    \"status\": \"completed\"\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/work-orders/:id", "host": ["{{baseUrl}}"], "path": ["work-orders", ":id"], "variable": [{"key":"id","value":""}] } } },
+				{ "name": "Delete Work Order", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/work-orders/:id", "host": ["{{baseUrl}}"], "path": ["work-orders", ":id"], "variable": [{"key":"id","value":""}] } } }
+			]
+		},
+		{
+			"name": "4. Incidents",
+			"item": [
+				{ "name": "List Incidents", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/incidents", "host": ["{{baseUrl}}"], "path": ["incidents"] } } },
+				{ "name": "Create Incident", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\n    \"title\": \"Security Breach\",\n    \"severity\": \"critical\",\n    \"location\": \"Main Gate\",\n    \"description\": \"Unauthorized entry attempted\"\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/incidents", "host": ["{{baseUrl}}"], "path": ["incidents"] } } },
+				{ "name": "Resolve Incident", "request": { "method": "PATCH", "body": { "mode": "raw", "raw": "{\n    \"status\": \"resolved\"\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/incidents/:id", "host": ["{{baseUrl}}"], "path": ["incidents", ":id"], "variable": [{"key":"id","value":""}] } } }
+			]
+		},
+		{
+			"name": "5. Inventory",
+			"item": [
+				{ "name": "List Inventory", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/inventory", "host": ["{{baseUrl}}"], "path": ["inventory"] } } },
+				{ "name": "Create Item", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\n    \"name\": \"PVC Pipe 2 inch\",\n    \"quantity\": 50,\n    \"unit\": \"meter\",\n    \"unitCost\": 120\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/inventory", "host": ["{{baseUrl}}"], "path": ["inventory"] } } },
+				{ "name": "Restock Item", "request": { "method": "PATCH", "body": { "mode": "raw", "raw": "{\n    \"quantity\": 10\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/inventory/:id/restock", "host": ["{{baseUrl}}"], "path": ["inventory", ":id", "restock"], "variable": [{"key":"id","value":""}] } } }
+			]
+		},
+		{
+			"name": "6. Maintenance (PM)",
+			"item": [
+				{ "name": "List PM Schedules", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/maintenance", "host": ["{{baseUrl}}"], "path": ["maintenance"] } } },
+				{ "name": "Complete Cycle", "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/maintenance/:id/complete", "host": ["{{baseUrl}}"], "path": ["maintenance", ":id", "complete"], "variable": [{"key":"id","value":""}] } } }
+			]
+		},
+		{
+			"name": "7. Spaces",
+			"item": [
+				{ "name": "List Spaces", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/spaces", "host": ["{{baseUrl}}"], "path": ["spaces"] } } },
+				{ "name": "Get Space Stats", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/spaces/stats", "host": ["{{baseUrl}}"], "path": ["spaces", "stats"] } } }
+			]
+		},
+		{
+			"name": "8. Users & Roles",
+			"item": [
+				{ "name": "List Users", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] } } },
+				{ "name": "Invite User", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\n    \"name\": \"New Tech\",\n    \"email\": \"tech@fmnexus.in\",\n    \"role\": \"technician\",\n    \"password\": \"Tech@123\"\n}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] } } }
+			]
+		},
+		{
+			"name": "9. Notifications",
+			"item": [
+				{ "name": "My Notifications", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/notifications", "host": ["{{baseUrl}}"], "path": ["notifications"] } } },
+				{ "name": "Mark All Read", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/notifications/read-all", "host": ["{{baseUrl}}"], "path": ["notifications", "read-all"] } } }
+			]
+		}
+	],
+	"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:5001/api", "type": "string" },
+		{ "key": "token", "value": "PASTE_TOKEN_HERE", "type": "string" }
+	]
+}

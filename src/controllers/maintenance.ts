@@ -45,26 +45,47 @@ export async function updateSchedule(req: Request, res: Response, next: NextFunc
   } catch (err) { next(err); }
 }
 
-// PATCH /api/maintenance/:id/complete — mark task done, advance nextDue
+// PATCH /api/maintenance/:id/complete — mark task done, advance nextDue, create record
 export async function completeSchedule(req: Request, res: Response, next: NextFunction) {
   try {
+    const { WorkOrder } = await import("../models/WorkOrder");
     const schedule = await PMSchedule.findById(req.params.id);
     if (!schedule) { res.status(404).json({ success: false, message: "PM schedule not found" }); return; }
+
+    // 1. Create a historical Work Order record
+    await WorkOrder.create({
+      title: `PM: ${schedule.title}`,
+      description: `Completed periodic maintenance cycle for ${schedule.assetName}.`,
+      category: "Maintenance",
+      type: "preventive",
+      priority: "medium",
+      status: "completed",
+      assetId: schedule.assetId,
+      assignedTo: schedule.assignedTo,
+      requestedBy: "FMNexus System",
+      closedAt: new Date(),
+      completedAt: new Date(),
+      auditLog: [{ action: "completed via PM schedule", performedBy: (req as any).user.name, timestamp: new Date() }]
+    });
 
     schedule.lastCompleted = new Date();
     schedule.status        = "active";
 
-    // advance nextDue based on frequency
-    const next = new Date();
+    // 2. Advance nextDue based on frequency
+    const nextDate = new Date();
     const freqDays: Record<string, number> = {
       daily: 1, weekly: 7, monthly: 30, quarterly: 90, "semi-annual": 180, annual: 365,
     };
     const days = freqDays[schedule.frequency] ?? 30;
-    next.setDate(next.getDate() + days);
-    schedule.nextDue = next;
+    nextDate.setDate(nextDate.getDate() + days);
+    schedule.nextDue = nextDate;
 
-    // reset checklist items for the fresh cycle
-    schedule.checklist.forEach((item: { completed: boolean }) => { item.completed = false; });
+    // 3. Reset checklist items for the fresh cycle (using map to ensure Mongoose tracks the change)
+    schedule.checklist = schedule.checklist.map(item => {
+      const plain = (item as any).toObject ? (item as any).toObject() : item;
+      return { ...plain, completed: false };
+    }) as any;
+    
     await schedule.save();
     res.json({ success: true, data: schedule });
   } catch (err) { next(err); }
