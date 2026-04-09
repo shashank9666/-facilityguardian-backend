@@ -1,4 +1,4 @@
-import { Incident } from "../models/Incident";
+import { ServiceRequest } from "../models/ServiceRequest";
 import { WorkOrder } from "../models/WorkOrder";
 import { User } from "../models/User";
 import { Inventory } from "../models/Inventory";
@@ -9,18 +9,18 @@ export async function seedMissingNotifications() {
   try {
     console.log("Seeding missing notifications for existing items...");
 
-    // 1. Incidents (Notify admins and managers for reported/investigating)
-    const incidents = await Incident.find({ status: { $in: ["reported", "investigating"] } });
-    for (const inc of incidents) {
+    // 1. Service Requests (Notify admins and managers for reported/investigating)
+    const serviceRequests = await ServiceRequest.find({ status: { $in: ["reported", "investigating"] } });
+    for (const sr of serviceRequests) {
       // Notify both Admins and Managers
       const targetRoles = ["admin", "manager"];
       for (const role of targetRoles) {
         await createSystemNotification({
           role,
           type: "warning",
-          title: `Active Incident: ${inc.title}`,
-          message: `${inc.severity} severity · ${inc.incidentNumber}`,
-          link: "/incidents",
+          title: `Active Service Request: ${sr.title}`,
+          message: `${sr.severity} severity · ${sr.requestNumber}`,
+          link: "/service-requests",
         });
       }
     }

@@ -7,8 +7,8 @@ interface ITimelineEntry {
   notes?: string;
 }
 
-export interface IIncident extends Document {
-  incidentNumber: string;
+export interface IServiceRequest extends Document {
+  requestNumber: string;
   title: string;
   description: string;
   severity: "low" | "medium" | "high" | "critical";
@@ -25,13 +25,12 @@ export interface IIncident extends Document {
 }
 
 const TimelineSchema = new Schema<ITimelineEntry>(
-  { action: String, performedBy: String, timestamp: { type: Date, default: Date.now }, notes: String },
-  { _id: false }
+  { action: String, performedBy: String, timestamp: { type: Date, default: Date.now }, notes: String }
 );
 
-const IncidentSchema = new Schema<IIncident>(
+const ServiceRequestSchema = new Schema<IServiceRequest>(
   {
-    incidentNumber: { type: String, required: true, unique: true, uppercase: true, trim: true },
+    requestNumber: { type: String, required: true, unique: true, uppercase: true, trim: true },
     title:          { type: String, required: true, trim: true, maxlength: 300 },
     description:    { type: String, trim: true, default: "" },
     severity:       { type: String, required: true, enum: ["low","medium","high","critical"], default: "medium" },
@@ -47,15 +46,15 @@ const IncidentSchema = new Schema<IIncident>(
   { timestamps: true }
 );
 
-// Auto-generate incidentNumber if missing
-IncidentSchema.pre("validate", function (next) {
-  if (!this.incidentNumber) {
-    this.incidentNumber = `INC-${Math.floor(10000 + Math.random() * 90000)}`;
+// Auto-generate requestNumber if missing
+ServiceRequestSchema.pre("validate", function (next) {
+  if (!this.requestNumber) {
+    this.requestNumber = `SR-${Math.floor(10000 + Math.random() * 90000)}`;
   }
   next();
 });
 
-IncidentSchema.index({ status: 1, severity: 1 });
+ServiceRequestSchema.index({ status: 1, severity: 1 });
 
 
-export const Incident = model<IIncident>("Incident", IncidentSchema);
+export const ServiceRequest = model<IServiceRequest>("ServiceRequest", ServiceRequestSchema);

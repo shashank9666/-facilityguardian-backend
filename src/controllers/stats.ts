@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Asset } from "../models/Asset";
 import { WorkOrder } from "../models/WorkOrder";
-import { Incident } from "../models/Incident";
+import { ServiceRequest } from "../models/ServiceRequest";
 import { Inventory } from "../models/Inventory";
 import { Vendor } from "../models/Vendor";
 import { Space } from "../models/Space";
@@ -12,7 +12,7 @@ export async function getGlobalStats(req: Request, res: Response, next: NextFunc
     const filter: any = {};
     if (department && department !== "All") filter.department = department;
 
-    // For site filtering, we need to find assets/incidents/WOs in spaces that belong to that site
+    // For site filtering, we need to find assets/service-requests/WOs in spaces that belong to that site
     let siteSpaceIds: any[] = [];
     if (site && site !== "All") {
       const targetSpaces = await Space.find({ site: String(site) }).select("_id");
@@ -29,8 +29,8 @@ export async function getGlobalStats(req: Request, res: Response, next: NextFunc
     const [
       totalAssets, faultyAssets,
       totalWOs, openWOs, criticalWOs, overdueWOs,
-      totalIncidents, activeIncidents,
-      criticalIncidents, totalInventoryValue,
+      totalServiceRequests, activeServiceRequests,
+      criticalServiceRequests, totalInventoryValue,
       lowStockCount, totalCapacity, totalOccupied
     ] = await Promise.all([
       Asset.countDocuments(applySiteFilter({ ...filter })),
@@ -39,9 +39,9 @@ export async function getGlobalStats(req: Request, res: Response, next: NextFunc
       WorkOrder.countDocuments(applySiteFilter({ ...filter, status: { $in: ["open", "assigned", "in_progress"] } }, "assetId")),
       WorkOrder.countDocuments(applySiteFilter({ ...filter, priority: "critical", status: { $ne: "completed" } }, "assetId")),
       WorkOrder.countDocuments(applySiteFilter({ ...filter, status: { $ne: "completed" }, dueDate: { $lt: new Date() } }, "assetId")),
-      Incident.countDocuments(applySiteFilter({ ...filter })),
-      Incident.countDocuments(applySiteFilter({ ...filter, status: { $nin: ["resolved", "closed"] } })),
-      Incident.countDocuments(applySiteFilter({ ...filter, severity: "critical", status: { $nin: ["resolved", "closed"] } })),
+      ServiceRequest.countDocuments(applySiteFilter({ ...filter })),
+      ServiceRequest.countDocuments(applySiteFilter({ ...filter, status: { $nin: ["resolved", "closed"] } })),
+      ServiceRequest.countDocuments(applySiteFilter({ ...filter, severity: "critical", status: { $nin: ["resolved", "closed"] } })),
       Inventory.aggregate([{ $group: { _id: null, total: { $sum: { $multiply: ["$quantity", "$unitCost"] } } } }]),
       Inventory.countDocuments({ status: { $ne: "in_stock" } }),
       Space.aggregate([{ $match: site && site !== "All" ? { site: String(site) } : {} }, { $group: { _id: null, total: { $sum: "$capacity" } } }]),
@@ -68,7 +68,7 @@ export async function getGlobalStats(req: Request, res: Response, next: NextFunc
           overdue: overdueWOs,
           trend: prevWOs > 0 ? ((recentWOs - prevWOs) / prevWOs * 100).toFixed(1) : 0
         },
-        incidents: { total: totalIncidents, active: activeIncidents, critical: criticalIncidents },
+        serviceRequests: { total: totalServiceRequests, active: activeServiceRequests, critical: criticalServiceRequests },
         inventory: { value: totalInventoryValue[0]?.total || 0, lowStock: lowStockCount },
         spaces: {
           capacity: totalCapacity[0]?.total || 0,

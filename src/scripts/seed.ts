@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { Asset } from "../models/Asset";
 import { WorkOrder } from "../models/WorkOrder";
 import { Vendor } from "../models/Vendor";
-import { Incident } from "../models/Incident";
+import { ServiceRequest } from "../models/ServiceRequest";
 import { Inventory } from "../models/Inventory";
 import { Space } from "../models/Space";
 import { PMSchedule } from "../models/PMSchedule";
@@ -23,7 +23,7 @@ async function seed() {
     Asset.deleteMany({}),
     WorkOrder.deleteMany({}),
     Vendor.deleteMany({}),
-    Incident.deleteMany({}),
+    ServiceRequest.deleteMany({}),
     Inventory.deleteMany({}),
     Space.deleteMany({}),
     PMSchedule.deleteMany({}),
@@ -337,10 +337,10 @@ async function seed() {
   ]);
   console.log(`✓ Seeded ${workOrders.length} work orders`);
 
-  // Incidents (incidentNumber is required)
-  const incidents = await Incident.insertMany([
+  // Service Requests (requestNumber is required)
+  const serviceRequests = await ServiceRequest.insertMany([
     {
-      incidentNumber: "INC-2024-001",
+      requestNumber: "SR-2024-001",
       title: "Water Leakage in Server Room",
       severity: "high",
       status: "investigating",
@@ -362,7 +362,7 @@ async function seed() {
       ],
     },
     {
-      incidentNumber: "INC-2024-002",
+      requestNumber: "SR-2024-002",
       title: "Power Fluctuation Wing B",
       severity: "critical",
       status: "resolved",
@@ -385,7 +385,7 @@ async function seed() {
       ],
     },
     {
-      incidentNumber: "INC-2024-003",
+      requestNumber: "SR-2024-003",
       title: "Elevator Stuck Between Floors",
       severity: "high",
       status: "closed",
@@ -408,7 +408,7 @@ async function seed() {
       ],
     },
   ]);
-  console.log(`✓ Seeded ${incidents.length} incidents`);
+  console.log(`✓ Seeded ${serviceRequests.length} service requests`);
 
   // Inventory (uses 'code' not 'sku', and schema fields)
   const inventory = await Inventory.insertMany([

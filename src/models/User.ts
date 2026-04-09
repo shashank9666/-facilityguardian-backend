@@ -12,7 +12,7 @@ export interface IUser extends Document {
   notificationPreferences: {
     workOrderAssigned: boolean;
     pmScheduleDue: boolean;
-    incidentReported: boolean;
+    serviceRequestReported: boolean;
     lowStockAlert: boolean;
     assetStatusChange: boolean;
     vendorContractExpiry: boolean;
@@ -36,7 +36,7 @@ const UserSchema = new Schema<IUser>(
     notificationPreferences: {
       workOrderAssigned:    { type: Boolean, default: true },
       pmScheduleDue:        { type: Boolean, default: true },
-      incidentReported:      { type: Boolean, default: true },
+      serviceRequestReported:      { type: Boolean, default: true },
       lowStockAlert:        { type: Boolean, default: true },
       assetStatusChange:    { type: Boolean, default: false },
       vendorContractExpiry: { type: Boolean, default: true },

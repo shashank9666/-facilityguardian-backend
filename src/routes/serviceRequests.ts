@@ -3,7 +3,7 @@ import { body, param, query } from "express-validator";
 import { authenticate } from "../middleware/auth";
 import { requireRole } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
-import * as ctrl from "../controllers/incidents";
+import * as ctrl from "../controllers/serviceRequests";
 
 const router = Router();
 
@@ -18,10 +18,10 @@ router.get(
     query("q").optional().isString().trim().escape(),
     validate,
   ],
-  ctrl.getIncidents,
+  ctrl.getServiceRequests,
 );
 
-router.get("/:id", authenticate, [param("id").isMongoId(), validate], ctrl.getIncident);
+router.get("/:id", authenticate, [param("id").isMongoId(), validate], ctrl.getServiceRequest);
 
 router.post(
   "/",
@@ -33,7 +33,7 @@ router.post(
     body("location").notEmpty().trim().escape(),
     validate,
   ],
-  ctrl.createIncident,
+  ctrl.createServiceRequest,
 );
 
 router.patch(
@@ -46,7 +46,7 @@ router.patch(
     body("severity").optional().isIn(["low", "medium", "high", "critical"]),
     validate,
   ],
-  ctrl.updateIncident,
+  ctrl.updateServiceRequest,
 );
 
 router.delete(
@@ -54,7 +54,7 @@ router.delete(
   authenticate,
   requireRole("admin"),
   [param("id").isMongoId(), validate],
-  ctrl.deleteIncident,
+  ctrl.deleteServiceRequest,
 );
 
 export default router;
